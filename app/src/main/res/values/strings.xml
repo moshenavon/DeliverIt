@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">DeliverIt</string>
+
+    <!-- Shared -->
+    <string name="back_cd">Back</string>
+    <string name="route_format">%1$s → %2$s</string>
+
+    <!-- Task list -->
+    <string name="task_list_title">DeliverIt</string>
+    <string name="task_list_empty">No deliveries yet.\nTap + to create one.</string>
+    <string name="task_list_create_cd">Create task</string>
+    <string name="task_list_refresh_failed">Failed to refresh tasks</string>
+
+    <!-- Create task -->
+    <string name="create_task_title">New Delivery</string>
+    <string name="create_task_item_description_label">Item description</string>
+    <string name="create_task_from_location_label">From location</string>
+    <string name="create_task_to_location_label">To location</string>
+    <string name="create_task_button">Create</string>
+    <string name="create_task_description_required">Description is required</string>
+    <string name="create_task_pickup_required">Pickup location is required</string>
+    <string name="create_task_dropoff_required">Drop-off location is required</string>
+    <string name="create_task_failed">Failed to create task</string>
+
+    <!-- Task detail -->
+    <string name="task_detail_default_title">Delivery Details</string>
+    <string name="task_detail_not_found">Task not found</string>
+    <string name="task_detail_update_status">Update status</string>
+    <string name="task_detail_status_timeline">Status timeline</string>
+    <string name="task_detail_refresh_failed">Failed to refresh</string>
+    <string name="task_detail_update_status_failed">Failed to update status</string>
+
+    <!-- Delivery statuses -->
+    <string name="status_pending">Pending</string>
+    <string name="status_assigned">Assigned</string>
+    <string name="status_in_transit">In Transit</string>
+    <string name="status_delivered">Delivered</string>
+    <string name="status_failed">Failed</string>
+
+    <string name="delivery_marked_failed">Delivery marked as failed</string>
+</resources>
