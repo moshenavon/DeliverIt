@@ -10,9 +10,7 @@ let tasks = [];
 
 app.get('/tasks', (req
                    , res) => {
-  res.status(400).json({ message: 'itemDescription, fromLocation and toLocation are required' });
-
-  // res.json([...tasks].sort((a, b) => b.createdAt - a.createdAt));
+   res.json([...tasks].sort((a, b) => b.createdAt - a.createdAt));
 });
 
 app.post('/tasks', (req, res) => {
