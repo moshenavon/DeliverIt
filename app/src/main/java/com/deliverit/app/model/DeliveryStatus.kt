@@ -5,5 +5,10 @@ enum class DeliveryStatus {
     ASSIGNED,
     IN_TRANSIT,
     DELIVERED,
-    FAILED
+    FAILED;
+
+    companion object {
+        fun fromName(name: String?): DeliveryStatus =
+            entries.firstOrNull { it.name == name } ?: PENDING
+    }
 }

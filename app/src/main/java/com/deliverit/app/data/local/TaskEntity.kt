@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.deliverit.app.model.DeliveryStatus
 import com.deliverit.app.model.DeliveryTask
 import com.deliverit.app.model.StatusHistoryEntry
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "tasks")
 data class TaskEntity(
@@ -18,8 +19,8 @@ data class TaskEntity(
 )
 
 data class StatusHistoryEntryColumn(
-    val status: String,
-    val timestamp: Long
+    @SerializedName("status") val status: String,
+    @SerializedName("timestamp") val timestamp: Long
 )
 
 fun TaskEntity.toDomain() = DeliveryTask(
@@ -27,17 +28,9 @@ fun TaskEntity.toDomain() = DeliveryTask(
     itemDescription = itemDescription,
     fromLocation = fromLocation,
     toLocation = toLocation,
-    status = DeliveryStatus.valueOf(status),
+    status = DeliveryStatus.fromName(status),
     createdAt = createdAt,
-    statusHistory = statusHistory.map { StatusHistoryEntry(DeliveryStatus.valueOf(it.status), it.timestamp) }
-)
-
-fun DeliveryTask.toEntity() = TaskEntity(
-    id = id,
-    itemDescription = itemDescription,
-    fromLocation = fromLocation,
-    toLocation = toLocation,
-    status = status.name,
-    createdAt = createdAt,
-    statusHistory = statusHistory.map { StatusHistoryEntryColumn(it.status.name, it.timestamp) }
+    statusHistory = statusHistory.map {
+        StatusHistoryEntry(DeliveryStatus.fromName(it.status), it.timestamp)
+    }
 )

@@ -1,6 +1,5 @@
 package com.deliverit.app.data
 
-import com.deliverit.app.data.local.LocalTaskDataSource
 import com.deliverit.app.data.local.TaskDao
 import com.deliverit.app.data.local.TaskEntity
 import com.deliverit.app.data.remote.CreateTaskRequest
@@ -58,7 +57,7 @@ class DefaultTaskRepositoryTest {
         api = mockk()
         repository = DefaultTaskRepository(
             remote = RemoteTaskDataSource(api),
-            local = LocalTaskDataSource(FakeTaskDao())
+            dao = FakeTaskDao()
         )
     }
 
@@ -194,6 +193,18 @@ class DefaultTaskRepositoryTest {
         val tasks = repository.observeTasks().first()
 
         assertEquals(listOf("new", "old"), tasks.map { it.id })
+    }
+
+    @Test
+    fun `unknown status from the server falls back to PENDING instead of crashing`() = runTest {
+        coEvery { api.getTasks() } returns listOf(
+            sampleTaskDto(status = "TELEPORTED")
+        )
+
+        val result = repository.refreshTasks()
+
+        assertTrue(result.isSuccess)
+        assertEquals(DeliveryStatus.PENDING, repository.observeTasks().first().single().status)
     }
 
     @Test
