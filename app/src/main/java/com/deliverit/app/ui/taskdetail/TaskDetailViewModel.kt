@@ -47,6 +47,8 @@ class TaskDetailViewModel @Inject constructor(
     }
 
     private fun changeStatus(status: DeliveryStatus) {
+        if (status == currentState.task?.status) return
+
         viewModelScope.launch {
             repository.updateTaskStatus(taskId, status).onFailure { e ->
                 val message = e.message?.let { UiText.DynamicString(it) }
