@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.deliverit.app.ui.navigation.DeliverItNavHost
 import com.deliverit.app.ui.theme.DeliverItTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,7 +18,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeliverItTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {}
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    DeliverItNavHost()
+                }
             }
         }
     }

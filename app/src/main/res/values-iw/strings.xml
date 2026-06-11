@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">DeliverIt</string>
+
+    <!-- Shared -->
+    <string name="back_cd">חזרה</string>
+    <string name="route_format">%1$s ← %2$s</string>
+
+    <!-- Task list -->
+    <string name="task_list_title">DeliverIt</string>
+    <string name="task_list_empty">אין עדיין משלוחים.\nהקישו על + כדי ליצור אחד.</string>
+    <string name="task_list_create_cd">יצירת משלוח</string>
+    <string name="task_list_refresh_failed">רענון רשימת המשלוחים נכשל</string>
+
+    <!-- Create task -->
+    <string name="create_task_title">משלוח חדש</string>
+    <string name="create_task_item_description_label">תיאור הפריט</string>
+    <string name="create_task_from_location_label">מיקום מוצא</string>
+    <string name="create_task_to_location_label">מיקום יעד</string>
+    <string name="create_task_button">יצירה</string>
+    <string name="create_task_description_required">יש להזין תיאור</string>
+    <string name="create_task_pickup_required">יש להזין מיקום איסוף</string>
+    <string name="create_task_dropoff_required">יש להזין מיקום מסירה</string>
+    <string name="create_task_failed">יצירת המשלוח נכשלה</string>
+
+    <!-- Task detail -->
+    <string name="task_detail_default_title">פרטי משלוח</string>
+    <string name="task_detail_not_found">המשלוח לא נמצא</string>
+    <string name="task_detail_update_status">עדכון סטטוס</string>
+    <string name="task_detail_status_timeline">היסטוריית סטטוס</string>
+    <string name="task_detail_refresh_failed">הרענון נכשל</string>
+    <string name="task_detail_update_status_failed">עדכון הסטטוס נכשל</string>
+
+    <!-- Delivery statuses -->
+    <string name="status_pending">ממתין</string>
+    <string name="status_assigned">שובץ</string>
+    <string name="status_in_transit">בדרך</string>
+    <string name="status_delivered">נמסר</string>
+    <string name="status_failed">נכשל</string>
+
+    <string name="delivery_marked_failed">המשלוח סומן כנכשל</string>
+</resources>
