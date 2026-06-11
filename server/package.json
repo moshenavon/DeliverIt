@@ -1,0 +1,12 @@
+{
+  "name": "deliverit-server",
+  "version": "1.0.0",
+  "description": "In-memory task list server for the DeliverIt app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
