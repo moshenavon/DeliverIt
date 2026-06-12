@@ -1,35 +1,33 @@
 package com.deliverit.app.data.remote
 
+import com.deliverit.app.data.local.StatusHistoryEntryColumn
+import com.deliverit.app.data.local.TaskEntity
 import com.deliverit.app.model.DeliveryStatus
-import com.deliverit.app.model.DeliveryTask
-import com.deliverit.app.model.StatusHistoryEntry
+import com.google.gson.annotations.SerializedName
 
 data class TaskDto(
-    val id: String,
-    val itemDescription: String,
-    val fromLocation: String,
-    val toLocation: String,
-    val status: String,
-    val createdAt: Long,
-    val statusHistory: List<StatusHistoryEntryDto>
+    @SerializedName("id") val id: String,
+    @SerializedName("itemDescription") val itemDescription: String,
+    @SerializedName("fromLocation") val fromLocation: String,
+    @SerializedName("toLocation") val toLocation: String,
+    @SerializedName("status") val status: String,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("statusHistory") val statusHistory: List<StatusHistoryEntryDto>
 )
 
 data class StatusHistoryEntryDto(
-    val status: String,
-    val timestamp: Long
+    @SerializedName("status") val status: String,
+    @SerializedName("timestamp") val timestamp: Long
 )
 
-fun TaskDto.toDomain() = DeliveryTask(
+fun TaskDto.toEntity() = TaskEntity(
     id = id,
     itemDescription = itemDescription,
     fromLocation = fromLocation,
     toLocation = toLocation,
-    status = DeliveryStatus.valueOf(status),
+    status = DeliveryStatus.fromName(status).name,
     createdAt = createdAt,
-    statusHistory = statusHistory.map { it.toDomain() }
-)
-
-fun StatusHistoryEntryDto.toDomain() = StatusHistoryEntry(
-    status = DeliveryStatus.valueOf(status),
-    timestamp = timestamp
+    statusHistory = statusHistory.map {
+        StatusHistoryEntryColumn(DeliveryStatus.fromName(it.status).name, it.timestamp)
+    }
 )

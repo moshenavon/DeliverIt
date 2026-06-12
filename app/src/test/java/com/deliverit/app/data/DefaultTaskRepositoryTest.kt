@@ -1,6 +1,9 @@
 package com.deliverit.app.data
 
+import com.deliverit.app.data.local.TaskDao
+import com.deliverit.app.data.local.TaskEntity
 import com.deliverit.app.data.remote.CreateTaskRequest
+import com.deliverit.app.data.remote.RemoteTaskDataSource
 import com.deliverit.app.data.remote.StatusHistoryEntryDto
 import com.deliverit.app.data.remote.TaskApi
 import com.deliverit.app.data.remote.TaskDto
@@ -9,23 +12,53 @@ import com.deliverit.app.model.DeliveryStatus
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 
-class RemoteTaskRepositoryTest {
+private class FakeTaskDao : TaskDao {
+
+    private val tasks = MutableStateFlow<Map<String, TaskEntity>>(emptyMap())
+
+    override fun observeTasks(): Flow<List<TaskEntity>> =
+        tasks.map { it.values.sortedByDescending { entity -> entity.createdAt } }
+
+    override fun observeTask(id: String): Flow<TaskEntity?> =
+        tasks.map { it[id] }
+
+    override suspend fun upsert(task: TaskEntity) {
+        tasks.update { it + (task.id to task) }
+    }
+
+    override suspend fun upsertAll(tasks: List<TaskEntity>) {
+        this.tasks.update { it + tasks.associateBy { entity -> entity.id } }
+    }
+
+    override suspend fun deleteAll() {
+        tasks.value = emptyMap()
+    }
+}
+
+class DefaultTaskRepositoryTest {
 
     private lateinit var api: TaskApi
-    private lateinit var repository: RemoteTaskRepository
+    private lateinit var repository: DefaultTaskRepository
 
     @Before
     fun setUp() {
         api = mockk()
-        repository = RemoteTaskRepository(api)
+        repository = DefaultTaskRepository(
+            remote = RemoteTaskDataSource(api),
+            dao = FakeTaskDao()
+        )
     }
 
     private fun sampleTaskDto(
@@ -35,15 +68,20 @@ class RemoteTaskRepositoryTest {
         toLocation: String = "Warehouse B",
         status: String = "PENDING",
         createdAt: Long = 0L,
-        statusHistory: List<StatusHistoryEntryDto> = listOf(StatusHistoryEntryDto(status, createdAt))
+        statusHistory: List<StatusHistoryEntryDto> = listOf(
+            StatusHistoryEntryDto(
+                status,
+                createdAt
+            )
+        )
     ) = TaskDto(
-        id = id,
-        itemDescription = itemDescription,
-        fromLocation = fromLocation,
-        toLocation = toLocation,
-        status = status,
-        createdAt = createdAt,
-        statusHistory = statusHistory
+        id,
+        itemDescription,
+        fromLocation,
+        toLocation,
+        status,
+        createdAt,
+        statusHistory
     )
 
     @Test
@@ -119,7 +157,7 @@ class RemoteTaskRepositoryTest {
         )
         repository.refreshTasks()
         coEvery { api.updateStatus("task-1", any()) } returns
-            sampleTaskDto(id = "task-1", status = "ASSIGNED")
+                sampleTaskDto(id = "task-1", status = "ASSIGNED")
 
         val result = repository.updateTaskStatus("task-1", DeliveryStatus.ASSIGNED)
 
@@ -132,16 +170,17 @@ class RemoteTaskRepositoryTest {
     }
 
     @Test
-    fun `updateTaskStatus returns failure and keeps tasks unchanged when the api throws`() = runTest {
-        coEvery { api.createTask(any()) } returns sampleTaskDto()
-        val created = repository.createTask("Box of books", "A", "B").getOrThrow()
-        coEvery { api.updateStatus(any(), any()) } throws RuntimeException("network error")
+    fun `updateTaskStatus returns failure and keeps tasks unchanged when the api throws`() =
+        runTest {
+            coEvery { api.createTask(any()) } returns sampleTaskDto()
+            val created = repository.createTask("Box of books", "A", "B").getOrThrow()
+            coEvery { api.updateStatus(any(), any()) } throws RuntimeException("network error")
 
-        val result = repository.updateTaskStatus(created.id, DeliveryStatus.ASSIGNED)
+            val result = repository.updateTaskStatus(created.id, DeliveryStatus.ASSIGNED)
 
-        assertTrue(result.isFailure)
-        assertEquals(DeliveryStatus.PENDING, repository.observeTask(created.id).first()?.status)
-    }
+            assertTrue(result.isFailure)
+            assertEquals(DeliveryStatus.PENDING, repository.observeTask(created.id).first()?.status)
+        }
 
     @Test
     fun `observeTasks returns tasks sorted by createdAt descending`() = runTest {
@@ -154,6 +193,18 @@ class RemoteTaskRepositoryTest {
         val tasks = repository.observeTasks().first()
 
         assertEquals(listOf("new", "old"), tasks.map { it.id })
+    }
+
+    @Test
+    fun `unknown status from the server falls back to PENDING instead of crashing`() = runTest {
+        coEvery { api.getTasks() } returns listOf(
+            sampleTaskDto(status = "TELEPORTED")
+        )
+
+        val result = repository.refreshTasks()
+
+        assertTrue(result.isSuccess)
+        assertEquals(DeliveryStatus.PENDING, repository.observeTasks().first().single().status)
     }
 
     @Test

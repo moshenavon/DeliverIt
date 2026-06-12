@@ -1,6 +1,6 @@
 package com.deliverit.app.di
 
-import com.deliverit.app.data.RemoteTaskRepository
+import com.deliverit.app.data.DefaultTaskRepository
 import com.deliverit.app.data.TaskRepository
 import dagger.Binds
 import dagger.Module
@@ -15,5 +15,5 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindTaskRepository(impl: RemoteTaskRepository): TaskRepository
+    abstract fun bindTaskRepository(impl: DefaultTaskRepository): TaskRepository
 }

@@ -1,11 +1,12 @@
 package com.deliverit.app.data.remote
 
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import retrofit2.HttpException
 
 data class ErrorResponseDto(
-    val error: String? = null,
-    val message: String? = null
+    @SerializedName("error") val error: String? = null,
+    @SerializedName("message") val message: String? = null
 )
 
 fun HttpException.serverMessage(): String? =
