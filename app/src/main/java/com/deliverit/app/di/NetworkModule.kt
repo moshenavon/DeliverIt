@@ -1,5 +1,6 @@
 package com.deliverit.app.di
 
+import com.deliverit.app.BuildConfig
 import com.deliverit.app.data.remote.TaskApi
 import dagger.Module
 import dagger.Provides
@@ -10,8 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-
-private const val BASE_URL = "http://10.0.2.2:3000/"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -32,7 +31,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.SERVER_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
