@@ -5,6 +5,7 @@ import com.deliverit.app.R
 import com.deliverit.app.data.TaskRepository
 import com.deliverit.app.ui.common.MviViewModel
 import com.deliverit.app.ui.common.UiText
+import com.deliverit.app.ui.common.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -60,9 +61,7 @@ class CreateTaskViewModel @Inject constructor(
             ).onSuccess {
                 sendEvent(CreateTaskEvent.NavigateBack)
             }.onFailure { e ->
-                val message = e.message?.let { UiText.DynamicString(it) }
-                    ?: UiText.StringResource(R.string.create_task_failed)
-                sendEvent(CreateTaskEvent.ShowError(message))
+                sendEvent(CreateTaskEvent.ShowError(e.toUiText(R.string.create_task_failed)))
             }
             setState { copy(isSubmitting = false) }
         }
